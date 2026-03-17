@@ -45,4 +45,9 @@ public class ProductController {
         boolean deleted = productService.deleteById(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/count")
+    public int countProducts(){
+        return productService.productsCount();
+    }
 }

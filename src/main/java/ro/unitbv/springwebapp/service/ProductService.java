@@ -45,4 +45,8 @@ public class ProductService {
     public boolean deleteById(Integer id) {
         return products.remove(id) != null;
     }
+
+    public int productsCount(){
+        return products.size();
+    }
 }
