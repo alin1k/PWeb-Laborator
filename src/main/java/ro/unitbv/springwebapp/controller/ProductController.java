@@ -7,6 +7,7 @@ import ro.unitbv.springwebapp.dto.CreateProductRequest;
 import ro.unitbv.springwebapp.model.Product;
 import ro.unitbv.springwebapp.service.ProductService;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/products")
@@ -49,5 +50,18 @@ public class ProductController {
     @GetMapping("/count")
     public int countProducts(){
         return productService.productsCount();
+    }
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<Product> searchProductByName(@PathVariable String name){
+        List<Product> products = productService.findAll();
+
+        for (Product product : products){
+            if(Objects.equals(product.getName(), name)){
+                return ResponseEntity.ok(product);
+            }
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
