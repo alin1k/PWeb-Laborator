@@ -35,14 +35,23 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
-        Product createdProduct = productService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponse(createdProduct));
+        try{
+            Product createdProduct = productService.create(request);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponse(createdProduct));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
-        Product updatedProduct = productService.update(id, product);
-        return (updatedProduct == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(new ProductResponse(updatedProduct));
+        try{
+            Product updatedProduct = productService.update(id, product);
+            return (updatedProduct == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(new ProductResponse(updatedProduct));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/{id}")
