@@ -68,4 +68,8 @@ public class ProductService {
     public int productsCount(){
         return productRepository.findAll().size();
     }
+
+    public List<Product> findByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
 }
