@@ -66,7 +66,33 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<Product> searchProductByName(@RequestParam String name){
-        return productService.findByName(name);
+    public List<ProductResponse> searchProductByName(@RequestParam(required = false) String name){
+        List<Product> products;
+
+        if(name == null){
+            products = productService.findAll();
+        }
+        else{
+            products = productService.findByName(name);
+        }
+
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
+    }
+
+    @GetMapping("/cheaper-than")
+    public List<ProductResponse> getCheaperThan(@RequestParam(required = false) Double price) {
+        List<Product> products;
+
+        if(price == null){
+            products =  productService.findAll();
+        }else{
+            products = productService.findCheaperThan(price);
+        }
+
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
     }
 }
