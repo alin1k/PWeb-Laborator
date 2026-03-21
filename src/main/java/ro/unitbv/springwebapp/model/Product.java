@@ -1,7 +1,14 @@
 package ro.unitbv.springwebapp.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "products")
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String name;
     private double price;
     private int stock;
@@ -10,6 +17,12 @@ public class Product {
 
     public Product(Integer id, String name, double price, int stock) {
         this.id = id;
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+    }
+
+    public Product(String name, double price, int stock) {
         this.name = name;
         this.price = price;
         this.stock = stock;

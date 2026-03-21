@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: lab-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: rest_lab_db
+      MYSQL_USER: labuser
+      MYSQL_PASSWORD: labpass
+    ports:
+      - "3306:3306"

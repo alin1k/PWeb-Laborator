@@ -3,6 +3,8 @@ package ro.unitbv.springwebapp.service;
 import org.springframework.stereotype.Service;
 import ro.unitbv.springwebapp.dto.CreateProductRequest;
 import ro.unitbv.springwebapp.model.Product;
+import ro.unitbv.springwebapp.repository.ProductRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,25 +13,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ProductService {
-    private final Map<Integer, Product> products = new ConcurrentHashMap<>();
-    private final AtomicInteger nextId = new AtomicInteger(4);
+    private final ProductRepository productRepository;
 
-    public ProductService() {
-        products.put(1, new Product(1, "Laptop", 3500.0, 10));
-        products.put(2, new Product(2, "Mouse", 120.0, 50));
-        products.put(3, new Product(3, "Keyboard", 250.0, 30));
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     public List<Product> findAll() {
-        return new ArrayList<>(products.values());
+        return productRepository.findAll();
     }
 
     public Product findById(Integer id) {
-        return products.get(id);
+        return productRepository.findById(id).orElse(null);
     }
 
     public Product create(CreateProductRequest request) throws IllegalArgumentException {
-        Integer id = nextId.getAndIncrement();
         if (request.getPrice() <= 0){
             throw new IllegalArgumentException("Price must be positive");
         }
@@ -38,13 +36,13 @@ public class ProductService {
             throw new IllegalArgumentException("Stock must not be negative");
         }
 
-        Product product = new Product(id, request.getName(), request.getPrice(), request.getStock());
-        products.put(id, product);
-        return product;
+        Product product = new Product(request.getName(), request.getPrice(), request.getStock());
+        return productRepository.save(product);
     }
 
     public Product update(Integer id, Product product) throws IllegalArgumentException {
-        if (!products.containsKey(id)) return null;
+        Product existing = productRepository.findById(id).orElse(null);
+        if (existing == null) return null;
 
         if (product.getPrice() <= 0){
             throw new IllegalArgumentException("Price must be positive");
@@ -54,16 +52,20 @@ public class ProductService {
             throw new IllegalArgumentException("Stock must not be negative");
         }
 
-        product.setId(id);
-        products.put(id, product);
-        return product;
+        existing.setName(product.getName());
+        existing.setPrice(product.getPrice());
+        existing.setStock(product.getStock());
+
+        return productRepository.save(existing);
     }
 
     public boolean deleteById(Integer id) {
-        return products.remove(id) != null;
+        if (!productRepository.existsById(id)) return false;
+        productRepository.deleteById(id);
+        return true;
     }
 
     public int productsCount(){
-        return products.size();
+        return productRepository.findAll().size();
     }
 }

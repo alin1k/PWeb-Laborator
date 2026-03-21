@@ -1,3 +1,15 @@
 spring:
-  application:
-    name: SpringWebApp
+  datasource:
+    url: jdbc:mysql://localhost:3306/rest_lab_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: labuser
+    password: labpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
