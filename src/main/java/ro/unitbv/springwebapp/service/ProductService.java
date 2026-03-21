@@ -28,11 +28,11 @@ public class ProductService {
     }
 
     public Product create(CreateProductRequest request) throws IllegalArgumentException {
-        if (request.getPrice() <= 0){
+        if (request.getPrice() <= 0) {
             throw new IllegalArgumentException("Price must be positive");
         }
 
-        if(request.getStock() < 0){
+        if (request.getStock() < 0) {
             throw new IllegalArgumentException("Stock must not be negative");
         }
 
@@ -44,11 +44,11 @@ public class ProductService {
         Product existing = productRepository.findById(id).orElse(null);
         if (existing == null) return null;
 
-        if (product.getPrice() <= 0){
+        if (product.getPrice() <= 0) {
             throw new IllegalArgumentException("Price must be positive");
         }
 
-        if(product.getStock() < 0){
+        if (product.getStock() < 0) {
             throw new IllegalArgumentException("Stock must not be negative");
         }
 
@@ -65,7 +65,15 @@ public class ProductService {
         return true;
     }
 
-    public int productsCount(){
+    public int productsCount() {
         return productRepository.findAll().size();
+    }
+
+    public List<Product> findByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Product> findCheaperThan(double price){
+        return productRepository.findByPriceLessThan(price);
     }
 }

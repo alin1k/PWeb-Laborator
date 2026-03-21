@@ -65,16 +65,34 @@ public class ProductController {
         return productService.productsCount();
     }
 
-    @GetMapping("/search/{name}")
-    public ResponseEntity<ProductResponse> searchProductByName(@PathVariable String name){
-        List<Product> products = productService.findAll();
+    @GetMapping("/search")
+    public List<ProductResponse> searchProductByName(@RequestParam(required = false) String name){
+        List<Product> products;
 
-        for (Product product : products){
-            if(Objects.equals(product.getName(), name)){
-                return ResponseEntity.ok(new ProductResponse(product));
-            }
+        if(name == null){
+            products = productService.findAll();
+        }
+        else{
+            products = productService.findByName(name);
         }
 
-        return ResponseEntity.notFound().build();
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
+    }
+
+    @GetMapping("/cheaper-than")
+    public List<ProductResponse> getCheaperThan(@RequestParam(required = false) Double price) {
+        List<Product> products;
+
+        if(price == null){
+            products =  productService.findAll();
+        }else{
+            products = productService.findCheaperThan(price);
+        }
+
+        return products.stream()
+                .map(ProductResponse::new)
+                .toList();
     }
 }
