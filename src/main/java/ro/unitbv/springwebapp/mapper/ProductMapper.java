@@ -13,6 +13,7 @@ public class ProductMapper {
                 .name(request.getName())
                 .price(request.getPrice())
                 .stock(request.getStock())
+                .category(request.getCategory())
                 .build();
     }
 
@@ -20,6 +21,7 @@ public class ProductMapper {
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
+        product.setCategory(request.getCategory());
     }
 
     public ProductResponse toResponse(Product product) {
@@ -28,6 +30,7 @@ public class ProductMapper {
                 .name(product.getName())
                 .price(product.getPrice())
                 .stock(product.getStock())
+                .category(product.getCategory())
                 .build();
     }
 }
