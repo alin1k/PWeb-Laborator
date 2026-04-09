@@ -51,6 +51,7 @@ public class ProductController {
 
     @GetMapping("/search")
     public List<ProductResponse> searchProductByName(@RequestParam(required = false) String name){
+        // cautarea dupa nume deja a fost implementata
         if(name == null) {
             return productService.findAll();
         }
