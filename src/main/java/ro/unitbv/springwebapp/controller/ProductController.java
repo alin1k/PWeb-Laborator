@@ -1,63 +1,47 @@
 package ro.unitbv.springwebapp.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ro.unitbv.springwebapp.dto.CreateProductRequest;
-import ro.unitbv.springwebapp.dto.ProductResponse;
-import ro.unitbv.springwebapp.model.Product;
+import ro.unitbv.springwebapp.dto.request.CreateProductRequest;
+import ro.unitbv.springwebapp.dto.request.UpdateProductRequest;
+import ro.unitbv.springwebapp.dto.response.ProductResponse;
 import ro.unitbv.springwebapp.service.ProductService;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-
     @GetMapping
     public List<ProductResponse> getAllProducts() {
-        List<Product> products = productService.findAll();
-        return products.stream()
-                .map(ProductResponse::new)
-                .toList();
+        return productService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Integer id) {
-        Product product = productService.findById(id);
-        return (product == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(new ProductResponse(product));
+    public ProductResponse getProductById(@PathVariable Integer id) {
+        return productService.findById(id);
     }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
-        try{
-            Product createdProduct = productService.create(request);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponse(createdProduct));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        ProductResponse createdProduct = productService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
-        try{
-            Product updatedProduct = productService.update(id, product);
-            return (updatedProduct == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(new ProductResponse(updatedProduct));
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().build();
-        }
+    public ProductResponse updateProduct(@PathVariable Integer id, @Valid @RequestBody UpdateProductRequest request) {
+        return productService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
-        boolean deleted = productService.deleteById(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        productService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/count")
@@ -67,32 +51,19 @@ public class ProductController {
 
     @GetMapping("/search")
     public List<ProductResponse> searchProductByName(@RequestParam(required = false) String name){
-        List<Product> products;
-
-        if(name == null){
-            products = productService.findAll();
-        }
-        else{
-            products = productService.findByName(name);
+        if(name == null) {
+            return productService.findAll();
         }
 
-        return products.stream()
-                .map(ProductResponse::new)
-                .toList();
+        return productService.findByName(name);
     }
 
     @GetMapping("/cheaper-than")
     public List<ProductResponse> getCheaperThan(@RequestParam(required = false) Double price) {
-        List<Product> products;
-
         if(price == null){
-            products =  productService.findAll();
-        }else{
-            products = productService.findCheaperThan(price);
+            return productService.findAll();
         }
 
-        return products.stream()
-                .map(ProductResponse::new)
-                .toList();
+        return productService.findCheaperThan(price);
     }
 }
