@@ -3,6 +3,8 @@ package ro.unitbv.springwebapp.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,4 +19,8 @@ public class Product {
     private String name;
     private double price;
     private int stock;
+    private String category;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

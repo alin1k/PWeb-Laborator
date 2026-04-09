@@ -25,4 +25,6 @@ public class UpdateProductRequest {
 
     @Min(value = 0, message = "Stocul nu poate fi negativ.")
     private int stock;
+
+    private String category;
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.unitbv.springwebapp.dto.request.CreateProductRequest;
 import ro.unitbv.springwebapp.dto.request.UpdateProductRequest;
+import ro.unitbv.springwebapp.dto.request.UpdateStockRequest;
 import ro.unitbv.springwebapp.dto.response.ProductResponse;
 import ro.unitbv.springwebapp.service.ProductService;
 import java.util.List;
@@ -38,6 +39,11 @@ public class ProductController {
         return productService.update(id, request);
     }
 
+    @PutMapping("/stock/{id}")
+    public ProductResponse updateProductStock(@PathVariable Integer id, @Valid @RequestBody UpdateStockRequest request){
+        return productService.updateStock(id, request);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
         productService.deleteById(id);
@@ -51,6 +57,7 @@ public class ProductController {
 
     @GetMapping("/search")
     public List<ProductResponse> searchProductByName(@RequestParam(required = false) String name){
+        // cautarea dupa nume deja a fost implementata
         if(name == null) {
             return productService.findAll();
         }
