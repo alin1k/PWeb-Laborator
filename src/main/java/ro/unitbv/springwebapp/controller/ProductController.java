@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.unitbv.springwebapp.dto.request.CreateProductRequest;
 import ro.unitbv.springwebapp.dto.request.UpdateProductRequest;
+import ro.unitbv.springwebapp.dto.request.UpdateStockRequest;
 import ro.unitbv.springwebapp.dto.response.ProductResponse;
 import ro.unitbv.springwebapp.service.ProductService;
 import java.util.List;
@@ -36,6 +37,11 @@ public class ProductController {
     @PutMapping("/{id}")
     public ProductResponse updateProduct(@PathVariable Integer id, @Valid @RequestBody UpdateProductRequest request) {
         return productService.update(id, request);
+    }
+
+    @PutMapping("/stock/{id}")
+    public ProductResponse updateProductStock(@PathVariable Integer id, @Valid @RequestBody UpdateStockRequest request){
+        return productService.updateStock(id, request);
     }
 
     @DeleteMapping("/{id}")

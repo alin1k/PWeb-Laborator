@@ -3,6 +3,7 @@ package ro.unitbv.springwebapp.mapper;
 import org.springframework.stereotype.Component;
 import ro.unitbv.springwebapp.dto.request.CreateProductRequest;
 import ro.unitbv.springwebapp.dto.request.UpdateProductRequest;
+import ro.unitbv.springwebapp.dto.request.UpdateStockRequest;
 import ro.unitbv.springwebapp.dto.response.ProductResponse;
 import ro.unitbv.springwebapp.model.Product;
 
@@ -22,6 +23,10 @@ public class ProductMapper {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setCategory(request.getCategory());
+    }
+
+    public void updateProductStock(Product product, UpdateStockRequest request){
+        product.setStock(request.getStock());
     }
 
     public ProductResponse toResponse(Product product) {

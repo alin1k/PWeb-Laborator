@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ro.unitbv.springwebapp.dto.request.CreateProductRequest;
 import ro.unitbv.springwebapp.dto.request.UpdateProductRequest;
+import ro.unitbv.springwebapp.dto.request.UpdateStockRequest;
 import ro.unitbv.springwebapp.dto.response.ProductResponse;
 import ro.unitbv.springwebapp.exception.ProductNotFoundException;
 import ro.unitbv.springwebapp.mapper.ProductMapper;
@@ -65,5 +66,13 @@ public class ProductService {
         return productRepository.findByPriceLessThan(price).stream()
                 .map(productMapper::toResponse)
                 .toList();
+    }
+
+    public ProductResponse updateStock(Integer id, UpdateStockRequest request){
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        productMapper.updateProductStock(existingProduct, request);
+        Product updatedProduct = productRepository.save(existingProduct);
+        return productMapper.toResponse(updatedProduct);
     }
 }
