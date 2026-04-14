@@ -11,6 +11,9 @@ import ro.unitbv.springwebapp.exception.ProductNotFoundException;
 import ro.unitbv.springwebapp.mapper.ProductMapper;
 import ro.unitbv.springwebapp.model.Product;
 import ro.unitbv.springwebapp.repository.ProductRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import jakarta.annotation.PostConstruct;
 
 import java.util.List;
 
@@ -18,8 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService {
+    private final MeterRegistry meterRegistry;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+    @PostConstruct
+    public void initMetrics() {
+        meterRegistry.gauge("products.total.count",
+                productRepository,
+                repo -> repo.count());
+    }
 
     public List<ProductResponse> findAll() {
         log.debug("Se solicita cautarea tuturor produselor");
@@ -33,20 +44,27 @@ public class ProductService {
 
     public ProductResponse findById(Integer id) {
         log.debug("Se cauta produsul cu id={}" , id);
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Produsul cu id={} nu a putu fi gasit", id);
-                    return new ProductNotFoundException(id);
-                });
 
-        log.info("Produsul {} cu id={} a fost gasit", product.getName(), id);
-        return productMapper.toResponse(product);
+        return Timer.builder("products.findById.time")
+                .register(meterRegistry)
+                .record(()->{
+                    Product product = productRepository.findById(id)
+                            .orElseThrow(() -> {
+                                log.warn("Produsul cu id={} nu a putu fi gasit", id);
+                                return new ProductNotFoundException(id);
+                            });
+
+                    log.info("Produsul {} cu id={} a fost gasit", product.getName(), id);
+
+                    return productMapper.toResponse(product);
+                });
     }
 
     public ProductResponse create(CreateProductRequest request) {
         log.debug("Se creaza un produs nou: name={}, price={}, stock={}", request.getName(), request.getPrice(), request.getStock());
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
+        meterRegistry.counter("products.created.count").increment();
 
         log.info("Produsul {} cu id={} a fost creat cu succes", savedProduct.getName(), savedProduct.getId());
         return productMapper.toResponse(savedProduct);

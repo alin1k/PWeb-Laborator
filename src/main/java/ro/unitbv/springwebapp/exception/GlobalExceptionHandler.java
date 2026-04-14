@@ -1,8 +1,8 @@
 package ro.unitbv.springwebapp.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,14 +14,18 @@ import ro.unitbv.springwebapp.dto.response.ValidationExceptionResponse;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import io.micrometer.core.instrument.MeterRegistry;
 
+@RequiredArgsConstructor
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    private final MeterRegistry meterRegistry;
 
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest request) {
         log.warn("Resursă inexistentă pentru path={}: {}", request.getRequestURI(), ex.getMessage());
+        meterRegistry.counter("product.notfound.count").increment();
 
         ErrorResponse response = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
